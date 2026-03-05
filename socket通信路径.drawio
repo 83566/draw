@@ -1,6 +1,6 @@
-<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:147.0) Gecko/20100101 Firefox/147.0" version="29.6.0">
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" version="29.6.0">
   <diagram name="第 1 页" id="mfiy413wXIuKUWSZgBCW">
-    <mxGraphModel dx="1055" dy="589" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="1102" dy="1136" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -8,16 +8,16 @@
           <mxGeometry height="50" width="120" x="120" y="60" as="geometry" />
         </mxCell>
         <mxCell id="eB0cGhlaOg5NHsAa_Zlf-2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;sketch=1;curveFitting=1;jiggle=2;strokeColor=light-dark(#0000ff, #ededed);labelBorderColor=none;fontSize=14;" value="物理内存ring_buff" vertex="1">
-          <mxGeometry height="50" width="120" x="120" y="200" as="geometry" />
+          <mxGeometry height="50" width="120" x="120" y="370" as="geometry" />
         </mxCell>
         <mxCell id="eB0cGhlaOg5NHsAa_Zlf-3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;sketch=1;curveFitting=1;jiggle=2;strokeColor=light-dark(#0000ff, #ededed);labelBorderColor=none;fontSize=14;" value="网卡中断" vertex="1">
-          <mxGeometry height="50" width="120" x="120" y="340" as="geometry" />
+          <mxGeometry height="50" width="120" x="120" y="560" as="geometry" />
         </mxCell>
         <mxCell id="eB0cGhlaOg5NHsAa_Zlf-4" parent="1" style="rounded=1;whiteSpace=wrap;html=1;sketch=1;curveFitting=1;jiggle=2;strokeColor=light-dark(#0000ff, #ededed);labelBorderColor=none;fontSize=14;" value="ksoftirqd" vertex="1">
-          <mxGeometry height="50" width="120" x="120" y="480" as="geometry" />
+          <mxGeometry height="50" width="120" x="120" y="640" as="geometry" />
         </mxCell>
         <mxCell id="eB0cGhlaOg5NHsAa_Zlf-5" parent="1" style="rounded=1;whiteSpace=wrap;html=1;sketch=1;curveFitting=1;jiggle=2;strokeColor=light-dark(#0000ff, #ededed);labelBorderColor=none;fontSize=14;" value="ksoftirqd" vertex="1">
-          <mxGeometry height="50" width="120" x="120" y="620" as="geometry" />
+          <mxGeometry height="50" width="120" x="120" y="690" as="geometry" />
         </mxCell>
         <mxCell id="eB0cGhlaOg5NHsAa_Zlf-7" parent="1" style="rounded=1;whiteSpace=wrap;html=1;sketch=1;curveFitting=1;jiggle=2;strokeColor=light-dark(#0000ff, #ededed);labelBorderColor=none;fontSize=14;" value="内核协议栈" vertex="1">
           <mxGeometry height="50" width="120" x="120" y="760" as="geometry" />
@@ -70,8 +70,8 @@
             <mxPoint x="510" y="1020" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="eB0cGhlaOg5NHsAa_Zlf-18" parent="1" style="rounded=1;whiteSpace=wrap;html=1;sketch=1;curveFitting=1;jiggle=2;strokeColor=light-dark(#0000ff, #ededed);labelBorderColor=none;fontSize=14;" value="NIC" vertex="1">
-          <mxGeometry height="50" width="120" x="340" y="60" as="geometry" />
+        <mxCell id="eB0cGhlaOg5NHsAa_Zlf-18" parent="1" style="rounded=1;whiteSpace=wrap;html=1;sketch=1;curveFitting=1;jiggle=2;strokeColor=light-dark(#0000ff, #ededed);labelBorderColor=none;fontSize=14;align=left;" value="1,网卡PHY芯片接收比特流，MAC芯片校验CRC,失败则丢包，开发层无感" vertex="1">
+          <mxGeometry height="50" width="420" x="330" y="10" as="geometry" />
         </mxCell>
         <mxCell id="eB0cGhlaOg5NHsAa_Zlf-19" edge="1" parent="1" source="eB0cGhlaOg5NHsAa_Zlf-1" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;sketch=1;curveFitting=1;jiggle=2;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="eB0cGhlaOg5NHsAa_Zlf-18" value="">
           <mxGeometry height="50" relative="1" width="50" as="geometry">
@@ -80,7 +80,58 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="eB0cGhlaOg5NHsAa_Zlf-20" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=light-dark(#0080ff, #ededed);fillColor=none;align=center;verticalAlign=middle;rounded=0;sketch=1;curveFitting=1;jiggle=2;fontFamily=Helvetica;fontSize=14;fontColor=default;labelBorderColor=none;dashed=1;" value="DMA" vertex="1">
-          <mxGeometry height="30" width="60" x="190" y="140" as="geometry" />
+          <mxGeometry height="30" width="60" x="110" y="190" as="geometry" />
+        </mxCell>
+        <mxCell id="lhdTtQXz3MQfcM-y71l0-1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;sketch=1;curveFitting=1;jiggle=2;strokeColor=light-dark(#0000ff, #ededed);labelBorderColor=none;fontSize=14;align=left;" value="2，驱动初始化，申请ring_buff(环形队列)、sk_buf 空间" vertex="1">
+          <mxGeometry height="50" width="430" x="330" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="lhdTtQXz3MQfcM-y71l0-4" edge="1" parent="1" source="eB0cGhlaOg5NHsAa_Zlf-1" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;sketch=1;curveFitting=1;jiggle=2;entryX=0.005;entryY=0.64;entryDx=0;entryDy=0;entryPerimeter=0;" target="lhdTtQXz3MQfcM-y71l0-1" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="600" y="290" as="sourcePoint" />
+            <mxPoint x="690" y="240" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="lhdTtQXz3MQfcM-y71l0-6" parent="1" style="rounded=1;whiteSpace=wrap;html=1;sketch=1;curveFitting=1;jiggle=2;strokeColor=light-dark(#0000ff, #ededed);labelBorderColor=none;fontSize=14;align=left;" value="DMA将数据包写入到指定的物理地址" vertex="1">
+          <mxGeometry height="50" width="240" x="330" y="180" as="geometry" />
+        </mxCell>
+        <mxCell id="lhdTtQXz3MQfcM-y71l0-7" parent="1" style="rounded=1;whiteSpace=wrap;html=1;sketch=1;curveFitting=1;jiggle=2;strokeColor=light-dark(#0000ff, #ededed);labelBorderColor=none;fontSize=14;align=left;" value="cache污染：此处物理地址的数据是新的，但cpu的cache是旧的" vertex="1">
+          <mxGeometry height="50" width="420" x="630" y="180" as="geometry" />
+        </mxCell>
+        <mxCell id="lhdTtQXz3MQfcM-y71l0-8" edge="1" parent="1" source="eB0cGhlaOg5NHsAa_Zlf-20" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;sketch=1;curveFitting=1;jiggle=2;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="lhdTtQXz3MQfcM-y71l0-6" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="550" y="430" as="sourcePoint" />
+            <mxPoint x="620" y="430" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="lhdTtQXz3MQfcM-y71l0-9" edge="1" parent="1" source="lhdTtQXz3MQfcM-y71l0-6" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;sketch=1;curveFitting=1;jiggle=2;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="lhdTtQXz3MQfcM-y71l0-7" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="600" y="340" as="sourcePoint" />
+            <mxPoint x="670" y="340" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="lhdTtQXz3MQfcM-y71l0-11" parent="1" style="rounded=1;whiteSpace=wrap;html=1;sketch=1;curveFitting=1;jiggle=2;strokeColor=light-dark(#0000ff, #ededed);labelBorderColor=none;fontSize=14;align=left;" value="深度可配置&amp;nbsp;" vertex="1">
+          <mxGeometry height="50" width="150" x="340" y="260" as="geometry" />
+        </mxCell>
+        <mxCell id="lhdTtQXz3MQfcM-y71l0-12" parent="1" style="rounded=1;whiteSpace=wrap;html=1;sketch=1;curveFitting=1;jiggle=2;strokeColor=light-dark(#0000ff, #ededed);labelBorderColor=none;fontSize=14;align=left;" value="连续物理内存块，大小固定结构体" vertex="1">
+          <mxGeometry height="50" width="150" x="340" y="330" as="geometry" />
+        </mxCell>
+        <mxCell id="lhdTtQXz3MQfcM-y71l0-13" parent="1" style="rounded=1;whiteSpace=wrap;html=1;sketch=1;curveFitting=1;jiggle=2;strokeColor=light-dark(#0000ff, #ededed);labelBorderColor=none;fontSize=14;align=left;" value="驱动调用dma_alloc_coherent() 申请，返回一个虚拟地址，一个物理地址" vertex="1">
+          <mxGeometry height="50" width="340" x="560" y="330" as="geometry" />
+        </mxCell>
+        <mxCell id="lhdTtQXz3MQfcM-y71l0-14" parent="1" style="rounded=1;whiteSpace=wrap;html=1;sketch=1;curveFitting=1;jiggle=2;strokeColor=light-dark(#0000ff, #ededed);labelBorderColor=none;fontSize=14;align=left;" value="驱动写一个ring深度循环，申请sk_buf 结构体和对应的data buf , 将物理地址记录到descriptor种" vertex="1">
+          <mxGeometry height="50" width="340" x="940" y="330" as="geometry" />
+        </mxCell>
+        <mxCell id="lhdTtQXz3MQfcM-y71l0-15" parent="1" style="rounded=1;whiteSpace=wrap;html=1;sketch=1;curveFitting=1;jiggle=2;strokeColor=light-dark(#0000ff, #ededed);labelBorderColor=none;fontSize=14;align=left;" value="逻辑链路" vertex="1">
+          <mxGeometry height="50" width="110" x="359" y="450" as="geometry" />
+        </mxCell>
+        <mxCell id="lhdTtQXz3MQfcM-y71l0-16" parent="1" style="rounded=1;whiteSpace=wrap;html=1;sketch=1;curveFitting=1;jiggle=2;strokeColor=light-dark(#0000ff, #ededed);labelBorderColor=none;fontSize=14;align=left;" value="cpu侧：拥有一个数组指针，只想ring_buff 虚拟地址" vertex="1">
+          <mxGeometry height="50" width="370" x="570" y="420" as="geometry" />
+        </mxCell>
+        <mxCell id="lhdTtQXz3MQfcM-y71l0-17" parent="1" style="rounded=1;whiteSpace=wrap;html=1;sketch=1;curveFitting=1;jiggle=2;strokeColor=light-dark(#0000ff, #ededed);labelBorderColor=none;fontSize=14;align=left;" value="网卡侧：拥有一个寄存器，存着ring_buff 物理地址" vertex="1">
+          <mxGeometry height="50" width="370" x="570" y="500" as="geometry" />
+        </mxCell>
+        <mxCell id="lhdTtQXz3MQfcM-y71l0-18" parent="1" style="rounded=1;whiteSpace=wrap;html=1;sketch=1;curveFitting=1;jiggle=2;strokeColor=light-dark(#0000ff, #ededed);labelBorderColor=none;fontSize=14;align=left;" value="内存中：desc0 -&amp;gt; 物理地址0x100 skb_0 ; ------" vertex="1">
+          <mxGeometry height="50" width="370" x="570" y="584.5" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
