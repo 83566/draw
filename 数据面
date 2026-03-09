@@ -89,6 +89,11 @@ perf stat 用来收集关键的性能计数器数据
                 分析意义： 说明 CPU 取指令或解码指令太慢，通常是因为代码体积太大、分支预测失败或取指缓存（ICache）未命中。
             stalled-cycles-backend: 指令后端停顿。
                 分析意义： 说明 CPU 在等待数据输入或执行单元忙。这是最常见的瓶颈，通常是因为等待内存数据返回。
+        内核与调度事件 (Context & System)， 如果你在做内核模块或系统级开发，关注这些软件事件。
+          context-switches: 上下文切换。
+              分析意义： 频繁切换会破坏缓存热度，增加内核开销。对于高性能应用，通常追求“零切换”。
+          cpu-migrations: CPU 迁移。进程在不同核心间跳动，会导致本地缓存失效。
+          page-faults: 缺页异常。如果大量发生，说明程序正在申请大量内存或频繁操作未映射的内存区域。
 
         task-clock (msec): 程序运行所占用的 CPU 总时间。
         context-switches: 上下文切换次数。如果这个值很高，说明进程频繁地被挂起或切换，可能存在激烈的锁竞争。
@@ -98,7 +103,10 @@ perf stat 用来收集关键的性能计数器数据
         instructions: 执行的指令数。
         branches: 分支指令数。
         branch-misses: 分支预测失败次数。如果这个比例超过 3%，通常意味着代码逻辑过于复杂或不可预测，严重影响性能。
+
       
+
+
 3.1.3 在高性能系统里的判断方法
   L1 miss < 3%    L1-dcache-loads/L1-dcache-loads-misses
   LLC miss < 1%   (last level cache)   
