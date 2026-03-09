@@ -76,7 +76,7 @@ perf stat 用来收集关键的性能计数器数据
         branch-misses: 核心指标。分支预测失败次数。如果该值较高，说明代码逻辑（如复杂的判断条件）导致 CPU 流水线频繁冲刷。
         insn per cycle (IPC): 核心指标。IPC=cyclesinstructions​/cycles。IPC 越高代表 CPU 效率越高。通常高于 1.0 较好，低于 0.5 可能存在严重的 I/O 或缓存瓶颈。
       内存与缓存事件 (Memory Hierarchy)
-        cache-references: 缓存访问总次数。
+        cache-references: 缓存访问总次数，（LLC cache）
         cache-misses: 关键指标。缓存未命中次数。如果这个比例很高，说明你的数据结构对缓存不友好。
         L1-dcache-load-misses: 一级数据缓存读取未命中。
         LLC-loads / LLC-load-misses: 末级缓存（Last Level Cache，通常是 L3）的访问与未命中。
