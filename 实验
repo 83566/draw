@@ -1,1 +1,434 @@
+第一阶段（0–2个月）：建立性能底层认知
+目标：理解 CPU、内存、cache 如何影响程序性能。这是所有高性能系统的基础。
+重点内容：
+CPU 与内存体系
+CPU pipeline
+分支预测
+指令级并行
+cache line
+cache miss
+false sharing
+NUMA
+必做实验
+cache line 实验
+false sharing 实验
+顺序访问 vs 随机访问性能
+NUMA 访问实验
+性能分析工具：
+perf
+perf stat
+perf record
+perf report
+FlameGraph
+推荐资料：
+Computer Systems: A Programmer's Perspective
+Systems Performance: Enterprise and the Cloud
+完成标志：
+能解释 为什么某段代码 cache miss 高
+能用 perf 找到 CPU 热点
 
+
+第二阶段（2–4个月）：Linux网络栈与数据包路径
+目标：彻底理解 一个数据包如何被Linux处理。
+重点学习：
+Linux网络路径
+NIC
+↓
+driver
+↓
+NAPI
+↓
+softirq
+↓
+sk_buff
+↓
+protocol stack
+↓
+socket
+关键模块：
+net_device
+sk_buff
+netfilter
+GRO
+TSO
+RPS
+RFS
+
+推荐资料：
+TCP/IP Illustrated Volume 1
+必须做的事情：
+阅读 Linux 网络栈源码
+trace 一个数据包路径
+使用 bpftrace 观察网络栈
+实验：
+抓包 + perf
+查看 softirq
+分析网络延迟
+
+完成标志：
+能画出完整 Linux收包流程图
+
+第三阶段（4–7个月）：用户态网络（数据面核心）
+目标：掌握 DPDK / XDP / AF_XDP。
+优先顺序：
+1 DPDK（最重要）
+核心概念：
+hugepage
+mbuf
+mempool
+lcore
+ring
+poll mode
+必须实现：
+项目1：
+DPDK L2 forwarding
+项目2
+DPDK firewall
+项目3：
+DPDK packet generator
+2 XDP
+理解：
+XDP hook
+BPF program
+redirect
+
+项目：
+XDP firewall
+3 AF_XDP
+理解：
+zero copy
+umem
+ring
+完成标志：
+能写一个 1000万pps级别包处理程序
+
+第四阶段（7–10个月）：高性能并发
+目标：掌握 无锁数据结构 + 高性能并发设计。
+重点：
+
+并发原语
+atomic
+memory ordering
+CAS
+锁机制
+mutex
+spinlock
+rwlock
+RCU
+lock-free
+ring buffer
+MPMC queue
+
+推荐资料：
+The Art of Multiprocessor Programming
+
+必须实现：
+项目：
+lock-free queue
+ring buffer
+高性能hash table
+
+第五阶段（10–13个月）：性能工程
+目标：具备 系统级性能优化能力。
+必须掌握：
+性能分析：
+perf
+bcc
+bpftrace
+flamegraph
+
+重要指标：
+CPU cycles
+LLC miss
+branch miss
+context switch
+
+优化方向：
+cache locality
+NUMA优化
+内存池
+批处理
+zero copy
+实验：
+DPDK性能优化
+CPU cache优化
+NUMA优化
+
+第六阶段（13–18个月）：系统级项目
+目标：形成 数据面工程经验。
+必须做 1–2个大型项目。
+推荐项目：
+项目1：高性能防火墙
+功能：
+DPDK RX
+五元组匹配
+ACL
+状态表
+TX
+性能目标：
+10M PPS
+项目2：用户态网络协议栈
+实现：
+UDP
+TCP简化版
+项目3（存储方向）
+实现：
+SPDK KV store
+必读源码（非常重要）
+数据面工程师必须读的：
+DPDK
+rte_mbuf
+rte_ring
+rte_hash
+
+Linux
+net/core/dev.c
+sk_buff
+eBPF
+libbpf
+xdp sample
+
+高性能工程师核心能力
+
+真正重要的是：
+1 理解CPU
+2 理解cache
+3 理解IO路径
+4 找到性能瓶颈
+5 设计高效数据结构
+
+项目一：数据包处理路径可视化工具
+目标：彻底理解 Linux 网络栈的数据包路径与性能瓶颈。
+核心技术：
+eBPF
+kprobe / tracepoint
+bpftrace
+perf
+实现内容：
+追踪数据包路径
+NIC
+→ driver
+→ NAPI
+→ softirq
+→ ip_rcv
+→ tcp_v4_rcv
+→ socket
+
+统计每个阶段耗时
+输出示例：
+
+driver: 2 us
+napi: 4 us
+ip_rcv: 3 us
+tcp: 6 us
+socket: 5 us
+
+生成 flame graph。
+实现方式：
+在关键函数上挂 eBPF probe
+统计 latency
+输出统计信息
+项目价值：
+深入理解 Linux 网络栈
+掌握 eBPF 可观测技术
+项目二：高性能无锁队列库
+目标：掌握 高并发数据结构与内存模型。
+核心技术：
+C11 atomic
+CAS
+memory ordering
+cache line 对齐
+实现内容：
+实现三个结构：
+SPSC queue（单生产者单消费者）
+MPSC queue
+MPMC queue
+性能测试：
+吞吐量
+延迟
+cache miss
+对比：
+mutex queue
+spinlock queue
+lock-free queue
+
+必须做的实验：
+false sharing 实验
+cache line padding
+推荐参考：
+The Art of Multiprocessor Programming
+项目价值：
+掌握 lock-free 编程
+理解 CPU memory model
+项目三：DPDK 高性能 L3 路由器
+目标：掌握 用户态数据面开发。
+核心技术：
+DPDK
+hugepage
+poll mode driver
+rte_mbuf
+rte_ring
+
+实现功能：
+
+RX packet
+→ parse ethernet
+→ parse ip
+→ routing lookup
+→ TX
+
+路由查找：
+
+实现两种结构：
+
+hash table
+radix tree
+
+性能目标：
+
+10M PPS
+
+性能优化：
+
+batch processing
+prefetch
+NUMA
+
+项目价值：
+
+理解数据面 pipeline
+
+学会用户态网络开发
+
+项目四：DPDK 状态防火墙
+
+目标：实现真实网络设备核心逻辑。
+
+核心技术：
+
+五元组匹配
+
+state table
+
+timeout
+
+connection tracking
+
+实现 pipeline：
+
+RX
+↓
+parser
+↓
+flow lookup
+↓
+ACL
+↓
+TX
+
+数据结构：
+
+hash table
+LRU
+timer wheel
+
+性能目标：
+
+5M–10M PPS
+
+扩展：
+
+实现：
+
+SYN flood protection
+connection limit
+
+项目价值：
+
+与真实防火墙数据面非常接近
+
+项目五：用户态 KV 存储引擎
+
+目标：掌握 高性能 IO 与存储设计。
+
+核心技术：
+
+SPDK
+
+NVMe
+
+io_uring
+
+zero copy
+
+实现功能：
+
+PUT key value
+GET key
+DELETE key
+
+存储结构：
+
+LSM tree
+WAL
+memtable
+
+性能测试：
+
+QPS
+latency
+p99 latency
+
+推荐阅读：
+
+Designing Data-Intensive Applications
+
+项目价值：
+
+进入高性能存储开发领域
+
+建议的项目顺序
+
+顺序非常重要：
+
+阶段1（基础）
+
+无锁队列
+
+阶段2（系统理解）
+
+网络路径追踪工具
+
+阶段3（数据面核心）
+
+DPDK 路由器
+
+阶段4（真实系统）
+
+DPDK 防火墙
+
+阶段5（扩展能力）
+
+KV 存储引擎
+每个项目必须做的事情
+
+不仅写代码，还要做：
+
+性能测试
+
+PPS
+latency
+CPU usage
+
+性能分析
+
+perf
+flamegraph
+cache miss
+
+性能优化
+
+cache locality
+prefetch
+NUMA
+batch
