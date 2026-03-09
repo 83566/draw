@@ -1,0 +1,256 @@
+一个 完整的 cache locality 实验程序。该程序对比三种访问模式：
+顺序访问（sequential）
+stride 访问（跳跃访问）
+随机访问（random）
+运行后可以用 perf 观察 cache miss、IPC、cycles 的差异
+
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+#define SIZE (256*1024*1024)   // 256MB
+#define STRIDE 16
+
+int *arr;
+
+void sequential()
+{
+    long long sum = 0;
+
+    for(long i = 0; i < SIZE; i++)
+        sum += arr[i];
+
+    printf("seq sum: %lld\n", sum);
+}
+
+void stride_access()
+{
+    long long sum = 0;
+
+    for(long i = 0; i < SIZE; i += STRIDE)
+        sum += arr[i];
+
+    printf("stride sum: %lld\n", sum);
+}
+
+void random_access()
+{
+    long long sum = 0;
+
+    for(long i = 0; i < SIZE; i++)
+    {
+        long idx = rand() % SIZE;
+        sum += arr[idx];
+    }
+
+    printf("rand sum: %lld\n", sum);
+}
+
+int main()
+{
+    arr = malloc(sizeof(int) * SIZE);
+
+    for(long i = 0; i < SIZE; i++)
+        arr[i] = i;
+
+    srand(time(NULL));
+
+    sequential();
+    stride_access();
+    random_access();
+
+    free(arr);
+}
+
+
+
+2 典型实验结果（示例）
+
+  顺序访问：
+  IPC: 2.1
+  cache-misses: 0.5%
+    
+  stride访问：
+  IPC: 1.4
+  cache-misses: 4%
+    
+  随机访问：
+  IPC: 0.5
+  cache-misses: 30%
+
+
+
+3，简历中实验描述
+CPU Cache Locality 性能实验
+• 编写 C 语言微基准程序测试顺序访问、stride 访问和随机访问三种内存访问模式。
+• 使用 Linux perf 硬件性能计数器统计 L1/L3 cache miss、IPC 和 CPU stall。
+• 实验结果表明顺序访问具有更好的 cache locality，而随机访问会导致明显的 memory stall。
+  
+在简历中，可以将相关程序合并在一起写：
+CPU 性能分析微基准实验：
+  1️⃣ cache locality 实验
+  2️⃣ pointer chasing vs array
+  3️⃣ false sharing 实验
+  4️⃣ cache line stride 实验
+  CPU Cache Hierarchy Reverse Engineering 实验
+
+
+CPU 性能分析微基准实验
+• 使用 C 语言实现 cache locality、pointer chasing、cache line stride 和 false sharing 等 CPU 性能微基准。
+• 通过 Linux perf 采集硬件性能计数器（cache miss、IPC、stalled cycles），分析内存访问模式对 CPU 性能的影响。
+• 实验验证 cache locality 和 cache coherence 对程序性能的重要性。
+
+
+
+一套 完整的 CPU 性能实验路线（5 个实验）：
+
+1️⃣ cache locality 实验
+2️⃣ cache hierarchy reverse engineering
+3️⃣ pointer chasing latency 实验
+4️⃣ false sharing 实验
+5️⃣ memory bandwidth 实验
+CPU 性能分析微基准实验（5个实验总结）
+• 使用 C 语言实现多个 CPU 性能 microbenchmark，包括
+  cache locality、cache hierarchy、pointer chasing、
+  false sharing 和 memory bandwidth 实验。
+• 使用 Linux perf 采集硬件性能计数器（cache miss、
+  IPC、stalled cycles），分析 CPU cache 和内存访问行为。
+• 通过实验研究 cache hierarchy、memory latency 和
+  cache coherence 对程序性能的影响。
+
+具体：
+1 Cache Locality 实验
+目的
+验证不同内存访问模式对 cache 命中率和性能的影响。
+实验内容
+实现三种访问方式：
+顺序访问
+for(i=0;i<N;i++)
+    sum += arr[i];
+stride访问
+for(i=0;i<N;i+=16)
+   sum += arr[i];
+随机访问
+sum += arr[rand()%N];
+测量指标
+使用：
+perf stat -d
+关注：
+L1-dcache-load-misses
+LLC-load-misses
+IPC
+预期结论
+顺序访问   cache miss 最低
+stride访问 miss 上升
+随机访问   miss 最高
+
+2 Cache Hierarchy Reverse Engineering
+目的：通过实验推断 CPU 的：
+L1 cache size
+L2 cache size
+L3 cache size
+方法：逐渐增大数组：
+4KB
+16KB
+32KB
+64KB
+128KB
+256KB
+512KB
+1MB
+4MB
+16MB
+64MB
+
+测量：：ns / access = 总运行时间 / 访问次数  每一次内存访问平均需要多少纳秒；
+ns = nanosecond = 10⁻⁹ 秒
+举例：
+    for (i = 0; i < N; i++) {
+      sum += arr[i];
+    }
+
+N = 10,000,000
+总运行时间 = 0.02 s
+
+0.02 s / 10,000,000
+= 2 × 10⁻⁹ s
+= 2 ns
+
+  
+代码核心：
+for(i=0;i<N;i++)
+    sum += arr[i];
+结果
+画出：
+latency vs array size
+会出现几个拐点，对应：
+L1
+L2
+L3
+DRAM
+
+3 Pointer Chasing Latency 实验
+目的：测量真实的 cache latency。
+顺序访问会被 CPU prefetcher 优化，因此需要 pointer chasing。
+数据结构
+struct node {
+    struct node *next;
+};
+访问方式：
+node = node->next;
+这样 CPU 无法提前加载数据。
+测量cycles per access
+预期结果：
+L1   ≈ 4 cycles
+L2   ≈ 12 cycles
+L3   ≈ 40 cycles
+DRAM ≈ 200 cycles
+  
+4 False Sharing 实验
+目的：演示 cache coherence 带来的性能问题。
+场景：两个线程更新不同变量：
+struct counter {
+    long a;
+    long b;
+};
+两个线程：
+thread1: a++
+thread2: b++
+如果 a 和 b 在同一个 cache line，会发生：
+false sharing
+优化方法：
+struct counter {
+    long a;
+    char padding[64];
+    long b;
+};
+测量
+运行时间
+CPU cycles
+
+结果：
+false sharing 版本明显更慢
+
+5 Memory Bandwidth 实验
+目的：测量 CPU 能达到的 最大内存带宽。
+
+方法：使用大数组连续读写：
+
+for(i=0;i<N;i++)
+    arr[i] += 1;
+计算：
+bandwidth = bytes / time
+例如：
+256MB / 0.02s = 12.8 GB/s
+进一步实验
+比较：
+1线程
+2线程
+4线程
+8线程
+观察带宽是否增长。
+
+
+
+
