@@ -12,8 +12,6 @@
   cache line
   cache miss
 
-
-
  2.4  cache locality （缓存局部性）
     指的是 CPU 频繁访问相同或附近的内存地址的趋势。它是利用 CPU 缓存机制来提升程序性能的基础。为了让程序跑得更快，我们希望数据尽可能待在 CPU 的高速缓存（L1/L2/L3 Cache）里，
 而不是慢速的主内存（RAM）里。
@@ -110,7 +108,7 @@ perf stat 用来收集关键的性能计数器数据
   IPC > 1.8 (instructions per cycle)
 
 
-3.1.4  cache locality 实验  
+3.1.4  cache locality 实验 ，见cpu 性能测试微实验
 
 
 
