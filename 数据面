@@ -77,7 +77,7 @@ perf stat 用来收集关键的性能计数器数据
         insn per cycle (IPC): 核心指标。IPC=cyclesinstructions​/cycles。IPC 越高代表 CPU 效率越高。通常高于 1.0 较好，低于 0.5 可能存在严重的 I/O 或缓存瓶颈。
       内存与缓存事件 (Memory Hierarchy)
         cache-references: 缓存访问总次数，（LLC cache）
-        cache-misses: 关键指标。缓存未命中次数。如果这个比例很高，说明你的数据结构对缓存不友好。
+        cache-misses: 关键指标。缓存未命中次数。如果这个比例很高，说明你的数据结构对缓存不友好。(LLC cache)
         L1-dcache-load-misses: 一级数据缓存读取未命中。
         LLC-loads / LLC-load-misses: 末级缓存（Last Level Cache，通常是 L3）的访问与未命中。
             分析意义： 如果 LLC 经常未命中，意味着 CPU 必须频繁访问内存（RAM），这比访问缓存慢数百倍。
@@ -108,11 +108,6 @@ perf stat 用来收集关键的性能计数器数据
   L1 miss < 3%    L1-dcache-loads/L1-dcache-loads-misses
   LLC miss < 1%   (last level cache)   
   IPC > 1.8 (instructions per cycle)
-
-
-
-
-
 
 
 
