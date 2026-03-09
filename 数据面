@@ -110,6 +110,9 @@ perf stat 用来收集关键的性能计数器数据
   IPC > 1.8 (instructions per cycle)
 
 
+3.1.4  cache locality 实验  
+
+
 
 二、Linux 内核原理
 高性能开发必须理解 Linux 内核如何管理资源。
