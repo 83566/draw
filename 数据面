@@ -12,6 +12,7 @@
   cache line
   cache miss
 
+
  2.4  cache locality （缓存局部性）
     指的是 CPU 频繁访问相同或附近的内存地址的趋势。它是利用 CPU 缓存机制来提升程序性能的基础。为了让程序跑得更快，我们希望数据尽可能待在 CPU 的高速缓存（L1/L2/L3 Cache）里，
 而不是慢速的主内存（RAM）里。
@@ -35,7 +36,6 @@
       （3）将频繁访问的变量放在一起：如果定义了一个结构体，把经常一起用到放在相邻的位置。
       （4）循环访问数据时，步长尽量小，避免大跨度跳跃
       （5）分块处理：对于超大数据集，可以分成小块处理，确保一块数据在被cpu处理期间，始终在缓存中。
-
 
   false sharing（性能杀手）
 
@@ -106,11 +106,13 @@ perf stat 用来收集关键的性能计数器数据
   L1 miss < 3%    L1-dcache-loads/L1-dcache-loads-misses
   LLC miss < 1%   (last level cache)   
   IPC > 1.8 (instructions per cycle)
+3.1.4 评价 cache locality 的正确方法
+  L1-dcache-load-misses / L1-dcache-loads，因为L1 是最频繁访问层
+    <1%   非常好
+    1–5%  正常
+    >10%  locality 差
 
-
-3.1.4  cache locality 实验 ，见cpu 性能测试微实验
-
-
+3.1.4  cache locality 实验 ，见《cpu性能分析基准实验》
 
 二、Linux 内核原理
 高性能开发必须理解 Linux 内核如何管理资源。
