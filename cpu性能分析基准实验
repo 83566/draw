@@ -1,71 +1,66 @@
-一个 完整的 cache locality 实验程序。该程序对比三种访问模式：
-顺序访问（sequential）
-stride 访问（跳跃访问）
-随机访问（random）
-运行后可以用 perf 观察 cache miss、IPC、cycles 的差异
+1，一个 完整的 cache locality 实验程序。该程序对比三种访问模式：
+    顺序访问（sequential）
+    stride 访问（跳跃访问）
+    随机访问（random）
+    运行后可以用 perf 观察 cache miss、IPC、cycles 的差异
 
+        #include <stdio.h>
+        #include <stdlib.h>
+        #include <time.h>
+        #define SIZE (256*1024*1024)   // 256MB
+        #define STRIDE 16
+        
+        int *arr;
+        void sequential()
+        {
+            long long sum = 0;
+        
+            for(long i = 0; i < SIZE; i++)
+                sum += arr[i];
+        
+            printf("seq sum: %lld\n", sum);
+        }
+        
+        void stride_access()
+        {
+            long long sum = 0;
+        
+            for(long i = 0; i < SIZE; i += STRIDE)
+                sum += arr[i];
+        
+            printf("stride sum: %lld\n", sum);
+        }
+        
+        void random_access()
+        {
+            long long sum = 0;
+        
+            for(long i = 0; i < SIZE; i++)
+            {
+                long idx = rand() % SIZE;
+                sum += arr[idx];
+            }
+        
+            printf("rand sum: %lld\n", sum);
+        }
+        
+        int main()
+        {
+            arr = malloc(sizeof(int) * SIZE);
+        
+            for(long i = 0; i < SIZE; i++)
+                arr[i] = i;
+        
+            srand(time(NULL));
+        
+            sequential();
+            stride_access();
+            random_access();
+        
+            free(arr);
+        }
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-
-#define SIZE (256*1024*1024)   // 256MB
-#define STRIDE 16
-
-int *arr;
-
-void sequential()
-{
-    long long sum = 0;
-
-    for(long i = 0; i < SIZE; i++)
-        sum += arr[i];
-
-    printf("seq sum: %lld\n", sum);
-}
-
-void stride_access()
-{
-    long long sum = 0;
-
-    for(long i = 0; i < SIZE; i += STRIDE)
-        sum += arr[i];
-
-    printf("stride sum: %lld\n", sum);
-}
-
-void random_access()
-{
-    long long sum = 0;
-
-    for(long i = 0; i < SIZE; i++)
-    {
-        long idx = rand() % SIZE;
-        sum += arr[idx];
-    }
-
-    printf("rand sum: %lld\n", sum);
-}
-
-int main()
-{
-    arr = malloc(sizeof(int) * SIZE);
-
-    for(long i = 0; i < SIZE; i++)
-        arr[i] = i;
-
-    srand(time(NULL));
-
-    sequential();
-    stride_access();
-    random_access();
-
-    free(arr);
-}
-
-
-
-2 典型实验结果（示例）
+1.1  典型实验结果（示例）
 
   顺序访问：
   IPC: 2.1
@@ -78,6 +73,56 @@ int main()
   随机访问：
   IPC: 0.5
   cache-misses: 30%
+
+
+
+2， false sharing 实验
+2.1 代码
+        #include <pthread.h>
+        #include <stdio.h>
+        
+        #define THREADS 4
+        #define ITER 100000000
+        long counter[THREADS];
+        
+        #if 0
+        typedef struct
+        {
+            long value;
+            char pad[64 - sizeof(long)];
+        } counter_t;
+        
+        counter_t counter[THREADS];
+        
+        #endif
+        void* worker(void* arg) {
+            int id = *(int*)arg;
+            for (long i = 0; i < ITER; i++) {
+                //counter[id].value++;   // 每个线程修改不同元素
+        		 counter[id]++;
+            }
+            return NULL;
+        }
+        
+        int main() {
+            pthread_t t[THREADS];
+            int id[THREADS];
+        
+            for (int i = 0; i < THREADS; i++) {
+                id[i] = i;
+                pthread_create(&t[i], NULL, worker, &id[i]);
+            }
+        
+            for (int i = 0; i < THREADS; i++) {
+                pthread_join(t[i], NULL);
+            }
+        
+            printf("done\n");
+        }
+2.2 怎么判断是false sharing
+    静态分析： 用 pahole 检查结构体布局，确认变量是否在同一个 Cache Line。
+    动态观测： 用 perf stat 监控 L1-dcache-load-misses 指标。
+    实验验证： 手动加入 padding 进行性能对比测试，这是最具说服力的证据
 
 
 
