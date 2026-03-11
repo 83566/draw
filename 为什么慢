@@ -1,0 +1,336 @@
+要真正理解 CPU 如何执行代码以及为什么会出现性能瓶颈，通常需要掌握五个层次的知识：编译与执行、CPU 微架构、内存系统、操作系统调度、网络数据路径。
+一、程序如何被 CPU 执行（基础）
+
+首先需要理解程序从代码到执行的过程。
+
+1 编译与链接
+
+需要理解：
+
+C代码 → 预处理 → 编译 → 汇编 → 链接 → 可执行文件
+
+关键知识：
+
+ELF 文件结构
+
+静态链接 / 动态链接
+
+函数调用过程
+
+栈与寄存器使用
+
+常见问题：
+
+函数调用开销
+
+inline 优化
+
+编译器优化（O2、O3）
+
+2 CPU 执行模型
+
+CPU执行指令的过程：
+
+取指 (Fetch)
+译码 (Decode)
+执行 (Execute)
+写回 (Writeback)
+
+现代 CPU 使用：
+
+流水线 (pipeline)
+
+需要理解：
+
+pipeline
+
+instruction latency
+
+throughput
+
+否则无法理解：
+
+为什么 IPC 会下降
+二、CPU 微架构（高性能核心）
+
+这是理解性能瓶颈最重要的一层。
+
+需要掌握：
+
+1 Pipeline
+
+CPU同时执行多条指令：
+
+instruction level parallelism
+
+关键概念：
+
+pipeline stall
+
+data dependency
+
+branch prediction
+
+2 Superscalar
+
+CPU每个周期执行多条指令。
+
+例如：
+
+4 instructions per cycle
+
+关键指标：
+
+IPC (instructions per cycle)
+3 Out-of-order execution
+
+CPU可以乱序执行指令。
+
+例如：
+
+load
+add
+store
+
+如果 load 等待内存：
+
+CPU可以先执行其他指令。
+
+4 Branch prediction
+
+分支预测失败会导致：
+
+pipeline flush
+
+性能损失。
+
+三、CPU Cache 与内存系统
+
+高性能网络程序 70%以上性能问题来自内存访问。
+
+必须理解：
+
+1 Cache hierarchy
+
+典型结构：
+
+L1 cache
+L2 cache
+L3 cache
+Memory
+
+关键指标：
+
+latency
+bandwidth
+2 Cache line
+
+基本单位：
+
+64 bytes
+
+影响：
+
+cache locality
+false sharing
+3 Cache miss
+
+三种类型：
+
+cold miss
+capacity miss
+conflict miss
+4 Memory latency
+
+典型延迟：
+
+L1 ≈ 4 cycles
+L2 ≈ 12 cycles
+L3 ≈ 40 cycles
+Memory ≈ 200 cycles
+5 TLB
+
+TLB 是页表缓存。
+
+关键问题：
+
+TLB miss
+
+解决方法：
+
+HugePage
+
+DPDK 必须理解这一点。
+
+四、并发与多核架构
+
+高性能网络通常是 多核程序。
+
+需要理解：
+
+1 Cache coherence
+
+多核 CPU 保证缓存一致性。
+
+协议：
+
+MESI
+
+带来的问题：
+
+false sharing
+2 NUMA
+
+服务器通常是：
+
+NUMA architecture
+
+远程内存访问：
+
+latency 更高
+
+DPDK 中经常需要：
+
+NUMA aware allocation
+3 CPU affinity
+
+绑定 CPU：
+
+taskset
+
+原因：
+
+减少 cache miss
+避免调度迁移
+五、Linux 操作系统层
+
+理解 CPU 执行代码必须理解 OS。
+
+关键知识：
+
+1 进程与线程
+
+理解：
+
+context switch
+
+开销：
+
+几千 cycles
+2 中断与软中断
+
+网络数据包到达流程：
+
+NIC interrupt
+softirq
+network stack
+
+DPDK 通过：
+
+polling
+
+避免中断。
+
+3 系统调用
+
+例如：
+
+send
+recv
+epoll
+
+系统调用成本较高。
+
+高性能网络常使用：
+
+zero-copy
+六、网络数据路径
+
+理解网络包如何从网卡到应用。
+
+传统路径：
+
+NIC
+ ↓
+Interrupt
+ ↓
+Kernel network stack
+ ↓
+Socket
+ ↓
+User program
+
+DPDK路径：
+
+NIC
+ ↓
+polling
+ ↓
+user space
+
+减少：
+
+context switch
+memory copy
+七、性能分析工具
+
+理解 CPU 执行代码还需要会 性能分析。
+
+常见工具：
+
+perf
+
+查看：
+
+CPU cycles
+cache miss
+IPC
+branch miss
+perf top
+
+找热点函数。
+
+perf record + perf report
+
+查看：
+
+hot path
+flame graph
+
+查看 CPU 时间分布。
+
+八、高性能网络需要掌握的核心能力
+
+综合起来，需要理解：
+
+CPU pipeline
+cache hierarchy
+memory latency
+NUMA
+network data path
+
+很多高性能系统的性能瓶颈其实是：
+
+memory latency
+
+而不是计算能力。
+
+九、最关键的五个知识点
+
+如果目标是 数据面开发 / DPDK / 高性能系统，最重要的是：
+
+1 CPU cache
+2 memory latency
+3 cache line
+4 NUMA
+5 perf 性能分析
+十、建议学习路径（系统性能工程）
+
+顺序建议：
+
+1 C语言 + 汇编基础
+2 CPU pipeline
+3 cache / memory
+4 Linux perf
+5 网络数据路径
+6 DPDK
