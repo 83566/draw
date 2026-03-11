@@ -13,9 +13,50 @@
 
 2 Cache体系
   2.1 L1 / L2 / L3 cache
+    1）为什么需要三层cache 
+      CPU执行速度远快于主存（DRAM）。如果每次访问数据都直接访问内存，CPU会大量等待。因此CPU采用 缓存层次结构（cache hierarchy),让大多数数据访问发生在更快的缓存中.
+  减少cpu的等待事件。
+
+  2）cache的结构
+    现代CPU通常有三级缓存。
+    层级                 大小         速度                     位置                   用途
+    L1 Cache（一级缓存） 32kb         最快（4cycles）        每个核心私有           当前执行的代码和数据
+    L2 Cache（二级缓存） 256KB–1MB    约12cycles             每个核心私有             L1未命中时访问
+    L3 Cache（三级缓存)  8MB–64MB     约 40 cycles          多核心共享               
+  3) 当cpu 需要访问变量时：load x
+    会按照顺序查找，
+    CPU
+     ↓
+    L1 hit?  yes → done
+     ↓
+    L2 hit?  yes → done
+     ↓
+    L3 hit?  yes → done
+     ↓
+    memory access
+  4）cache hit / cache miss
+    cache hit 数据已经在cache 
+    cache miss 数据不在cache ,需要去内存中取
+
+  5) cache 对性能的影响
+    访问cache快，L1cache 4cycles ,L3 cache 40cycles ,而访问memory ≈ 200 cycles， 
+    如果数据都在cache 中，取数据的时间就会变短。CPU等待内存的时间减少，性能就会高
+
+    对应cache miss 就会增加cpu 周期
+    L1 miss → L ≈ 10 cycles
+    L2 miss → L3 ≈ 30 cycles
+    L3 miss → memory  ≈ 200 cycles
+
+
+CPU core
+ ├─ L1 instruction cache
+ └─ L1 data cache
 
   2.2 cache line
-  
+    Cache 并不是按字节加载的，而是以 64 字节 (Cache Line) 为基本单位。
+      面试官关点： 如果你修改一个 long 类型变量，CPU 会把周围的 64 字节全部加载进缓存。也就是 spatial locality （空间局部性）
+      后果： 编写代码时，数据结构如果能按照 64 字节对齐，能极大减少内存访问次数
+
   2.3 cache miss
     Cache miss 指 CPU 访问某个数据时，在当前缓存层级中没有找到该数据，需要到更低层级缓存或主内存读取。由于缓存层级访问延迟差异很大，cache miss 会显著影响程序性能。
       典型 CPU 的缓存结构:
@@ -81,7 +122,61 @@
       （4）循环访问数据时，步长尽量小，避免大跨度跳跃
       （5）分块处理：对于超大数据集，可以分成小块处理，确保一块数据在被cpu处理期间，始终在缓存中。
 
-  false sharing（性能杀手）
+  2.5 false sharing（性能杀手）
+    场景： 核心 A 修改变量 X，核心 B 修改变量 Y。如果 X 和 Y 恰好在同一个 64 字节的 Cache Line 里，L1/L2 必须频繁同步。
+    后果： 即使两个核心处理不同的业务，也会因为争抢同一个 Cache Line 导致性能雪崩。
+    对齐优化： 在高性能 C 代码中，我们会使用 __attribute__((aligned(64))) 来强行拉开变量距离。
+
+    常见面试题目：
+    1）深度原理：为什么修改不同的变量会互相干扰？
+   面试官： “既然核心 A 改的是变量 X，核心 B 改的是变量 Y，硬件层面上它们是怎么打架的？”
+    核心逻辑：
+      MESI 协议： 你需要提到 MESI（Modified, Exclusive, Shared, Invalid） 协议。
+      触发流程： 当核心 A 修改 Cache Line 中的 X 时，硬件会将该 Cache Line 标记为 Modified。根据一致性协议，核心 B 中包含 Y 的同一个 Cache Line 必须被标记为 Invalid。
+      性能杀手： 即使核心 B 根本不关心 X，它在读取 Y 时也会发现缓存失效，被迫去 L3 甚至内存重新加载。这被称为缓存抖动（Cache Thrashing）。
+
+  2）场景辨析：哪些代码最容易写出伪共享？
+    面试官追问： “在你做的防火墙系统中，给几个具体的伪共享场景。”
+
+  高危场景：
+    统计计数器： 比如一个全局结构体存储各网卡的丢包数：struct stats { uint64_t port0_drop; uint64_t port1_drop; };。如果核 0 处理口 0，核 1 处理口 1，
+        这两个计数器极大概率在同一个 Cache Line 里。
+    无锁队列头尾指针： Ring Buffer 的 head 和 tail。生产者改 tail，消费者改 head，如果它们靠得太近，两边都会变慢。
+    多线程共享的高频结构体： 比如一个包含锁（Spinlock）和数据的结构体。
+
+  3）实战观测：你如何确定程序里存在伪共享
+    面试官追问： “如果你发现程序变慢了，你怎么‘抓到’是伪共享干的？”
+    必杀技：perf 工
+    使用 perf c2c (Cache-to-Cache) 命令。这是 Linux 专门用于检测伪共享的利器。
+    它能直接指出哪些内存地址存在频繁的 Remote HITM（Hit Modified，即命中了其他核心已修改的缓存行），并定位到具体的代码行。
+
+    如果没有c2c 
+      即使没有 c2c 插件，标准的 perf stat 也能通过硬件计数器提供线索。
+      执行命令：
+      分析特征：
+          高 L1-dcache-load-misses： 伪共享会导致缓存行频繁被其他核心设置为 Invalid，从而引发大量的 L1 缓存缺失
+          高 IPC (Instructions Per Cycle) 却低吞吐： 如果你发现 CPU 核心非常忙（Cycles 很高），但实际处理的业务数据包（pps）上不去，且 Cache Miss 异常高，
+          这就是典型的缓存颠簸。
+
+  4）解决方案：除了加 Padding，还有什么优雅的办法？
+  面试官追问： “在 C 语言中，你会怎么写代码来彻底消除它？”
+    方案 A：对齐填充 (Manual Padding
+    方案 B：语言/编译器特性 (更优雅)
+        使用 C11 标准的 alignas(64)。
+        使用 GCC 特有的 __attribute__((aligned(64)))。
+    方案 C：空间换时间 (Per-Core Data)
+        为每个 CPU 核心分配独立的变量副本。例如，每个核只改自己私有的计数器，最后读取时再累加。
+
+  5）扩展思考：伪共享一定是坏的吗？
+    面试官追问： “如果我故意把两个变量放在一起，有没有好处？”
+    逆向思维： * 如果两个变量总是被同一个线程同时修改，把它们放在一个 Cache Line 反而是好事。因为一次加载就能把两个都带进缓存（空间局部性），提升效率。
+    关键在于：访问模式（Access Pattern）是否匹配。
+
+
+  6）常见的性能问题
+    （1） Cache Thrashing ，数据太大，超过cache
+    （2）pointer chasing，随机访问，每次访问不同cache line，导致大量cache miss
+    （3）False Sharing，多线程访问同一cache line ,触发cache 一致性
 
 关键概念
   cache friendly data structure
