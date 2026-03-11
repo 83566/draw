@@ -1,0 +1,283 @@
+第1阶段（1–3个月）
+C语言与Linux系统基础强化
+
+目标：达到系统级C工程师水平。
+
+重点：
+
+C语言深度
+
+重点掌握：
+
+指针与内存模型
+
+结构体对齐
+
+位运算
+
+函数调用约定
+
+编译器优化
+
+理解：
+
+stack
+heap
+bss
+text
+
+推荐书：
+
+Expert C Programming: Deep C Secrets
+
+Linux系统编程
+
+必须熟练：
+
+fork
+exec
+pthread
+pipe
+epoll
+
+理解：
+
+进程
+线程
+文件描述符
+信号
+
+推荐书：
+
+Linux高性能服务器编程
+
+实践项目
+
+实现一个：
+
+epoll TCP server
+
+要求：
+
+支持1万连接
+
+非阻塞IO
+
+线程池
+
+第2阶段（4–6个月）
+操作系统与网络栈
+
+目标：理解 Linux 如何运行程序。
+
+虚拟内存
+
+核心概念：
+
+virtual memory
+page table
+TLB
+page fault
+
+必须理解：
+
+HugePage
+进程调度
+
+理解：
+
+context switch
+run queue
+CFS scheduler
+
+关键问题：
+
+为什么频繁切换线程会降低性能。
+
+Linux 网络栈
+
+理解数据路径：
+
+NIC
+↓
+interrupt
+↓
+softirq
+↓
+network stack
+↓
+socket
+↓
+user space
+
+关键结构：
+
+sk_buff
+
+推荐书：
+
+Operating Systems: Three Easy Pieces
+
+实践项目
+
+实现一个：
+
+简单HTTP服务器
+
+并测试：
+
+QPS
+
+工具：
+
+wrk
+ab
+第3阶段（7–9个月）
+CPU体系结构与性能
+
+目标：理解 CPU如何执行代码。
+
+CPU pipeline
+
+核心：
+
+instruction pipeline
+out-of-order execution
+instruction level parallelism
+
+关键问题：
+
+为什么 CPU 会 stall。
+
+CPU cache
+
+重点：
+
+cache line
+cache hierarchy
+cache miss
+cache locality
+
+典型延迟：
+
+L1 ≈ 4 cycles
+L2 ≈ 12 cycles
+L3 ≈ 40 cycles
+Memory ≈ 200 cycles
+并发性能问题
+
+必须理解：
+
+false sharing
+cache coherence
+NUMA
+性能分析工具
+
+必须掌握：
+
+perf
+
+典型指标：
+
+IPC
+cache-misses
+branch-misses
+cycles
+
+推荐书：
+
+Computer Systems: A Programmer's Perspective
+
+必做实验（非常重要）
+
+1
+
+cache locality 实验
+
+2
+
+cache hierarchy reverse engineering
+
+3
+
+pointer chasing latency
+
+4
+
+false sharing
+
+5
+
+memory bandwidth
+
+完成这些实验后，基本具备 系统性能工程入门能力。
+
+第4阶段（10–12个月）
+高性能网络与数据面
+
+目标：成为 高性能网络开发工程师。
+
+DPDK
+
+必须理解：
+
+poll mode driver
+mbuf
+ring buffer
+hugepage
+
+核心思想：
+
+polling
+zero-copy
+user-space driver
+NUMA优化
+
+服务器通常：
+
+multi-socket
+
+需要：
+
+NUMA aware memory allocation
+
+否则：
+
+远程内存访问延迟高
+批处理优化
+
+DPDK 常见技术：
+
+batch processing
+
+例如：
+
+一次处理 32 packets
+
+减少：
+
+cache miss
+函数调用
+CPU绑定
+
+避免：
+
+CPU迁移
+cache cold
+
+工具：
+
+taskset
+实践项目
+
+实现：
+
+DPDK packet forwarder
+
+功能：
+
+RX → parse → TX
+
+目标性能：
+
+10M PPS
