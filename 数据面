@@ -7,11 +7,15 @@
   超标量执行
   指令级并行（ILP）
   SIMD / AVX
+
+
+
+
 2 Cache体系
   2.1 L1 / L2 / L3 cache
 
   2.2 cache line
-
+  
   2.3 cache miss
     Cache miss 指 CPU 访问某个数据时，在当前缓存层级中没有找到该数据，需要到更低层级缓存或主内存读取。由于缓存层级访问延迟差异很大，cache miss 会显著影响程序性能。
       典型 CPU 的缓存结构:
