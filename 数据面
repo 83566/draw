@@ -172,8 +172,10 @@ CPU core
     逆向思维： * 如果两个变量总是被同一个线程同时修改，把它们放在一个 Cache Line 反而是好事。因为一次加载就能把两个都带进缓存（空间局部性），提升效率。
     关键在于：访问模式（Access Pattern）是否匹配。
 
+  6）为什么 false sharing 程序 cache miss 很低，但性能却很差？
+    因为性能瓶颈不是 cache miss，而是 cache coherence (MESI) 导致的 cache line bouncing（缓存行跳跃）。
 
-  6）常见的性能问题
+  7）常见的性能问题
     （1） Cache Thrashing ，数据太大，超过cache
     （2）pointer chasing，随机访问，每次访问不同cache line，导致大量cache miss
     （3）False Sharing，多线程访问同一cache line ,触发cache 一致性
@@ -201,6 +203,14 @@ perf stat 用来收集关键的性能计数器数据
     记录完成后，使用perf report 查看具体内容
 （6）perf top
     展示占用cpu最多的函数。执行后，会看到一个实时刷新的列表，最上面是当前采样周期内cpu 占用率最好的内核或者用户空间函数。用于快速定位哪个模块、哪个函数在消耗cpu
+
+（7）perf总结 
+
+    perf stat  总体统计
+    perf record/report  统计热点函数   
+    perf mem    内存访问行为  (暂无测试)
+    perf c2c    cache line sharing（暂无测试）
+
 
 3.1.2 使用技巧
   （1）使用perf list 查看可用事件 
