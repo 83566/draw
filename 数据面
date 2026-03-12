@@ -146,8 +146,7 @@ CPU core
 
   3）实战观测：你如何确定程序里存在伪共享
     面试官追问： “如果你发现程序变慢了，你怎么‘抓到’是伪共享干的？”
-    必杀技：perf 工
-    使用 perf c2c (Cache-to-Cache) 命令。这是 Linux 专门用于检测伪共享的利器。
+    必杀技：perf工具，使用 perf c2c (Cache-to-Cache) 命令。这是 Linux 专门用于检测伪共享的利器。
     它能直接指出哪些内存地址存在频繁的 Remote HITM（Hit Modified，即命中了其他核心已修改的缓存行），并定位到具体的代码行。
 
     如果没有c2c 
@@ -158,6 +157,23 @@ CPU core
           高 IPC (Instructions Per Cycle) 却低吞吐： 如果你发现 CPU 核心非常忙（Cycles 很高），但实际处理的业务数据包（pps）上不去，且 Cache Miss 异常高，
           这就是典型的缓存颠簸。
 
+    perf c2c 使用方法：
+      （1）perf c2c record ./program 
+        运行结束后生成：perf.data
+      （2）查看报告，
+        perf c2c report
+      （3）典型输出：
+        Shared Data Cache Line Table
+        Cacheline        Total HITM   Store   Load
+        0x7f2a8b34000       12500     8000    4500
+      （4）字段含义
+        Cacheline	cache line 地址
+        Load	读取次数
+        Store	写入次数
+        HITM	hit modified
+        关键指标：HITM（Hit Modified）
+        此值高，说明可能存在cache false sharing
+        
   4）解决方案：除了加 Padding，还有什么优雅的办法？
   面试官追问： “在 C 语言中，你会怎么写代码来彻底消除它？”
     方案 A：对齐填充 (Manual Padding
