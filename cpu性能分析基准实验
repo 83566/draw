@@ -165,7 +165,7 @@ CPU 性能分析微基准实验（5个实验总结）
   cache coherence 对程序性能的影响。
 
 具体：
-1 Cache Locality 实验
+1, Cache Locality 实验
 目的
 验证不同内存访问模式对 cache 命中率和性能的影响。
 实验内容
@@ -190,7 +190,7 @@ IPC
 stride访问 miss 上升
 随机访问   miss 最高
 
-2 Cache Hierarchy Reverse Engineering
+2 ,Cache Hierarchy Reverse Engineering
 目的：通过实验推断 CPU 的：
 L1 cache size
 L2 cache size
@@ -235,7 +235,7 @@ L2
 L3
 DRAM
 
-3 Pointer Chasing Latency 实验
+3 ,Pointer Chasing Latency 实验
 目的：测量真实的 cache latency。
 顺序访问会被 CPU prefetcher 优化，因此需要 pointer chasing。
 数据结构
@@ -252,7 +252,7 @@ L2   ≈ 12 cycles
 L3   ≈ 40 cycles
 DRAM ≈ 200 cycles
   
-4 False Sharing 实验
+4 ,False Sharing 实验
 目的：演示 cache coherence 带来的性能问题。
 场景：两个线程更新不同变量：
 struct counter {
@@ -277,7 +277,7 @@ CPU cycles
 结果：
 false sharing 版本明显更慢
 
-5 Memory Bandwidth 实验
+5 ,Memory Bandwidth 实验
 目的：测量 CPU 能达到的 最大内存带宽。
 
 方法：使用大数组连续读写：
@@ -295,6 +295,34 @@ bandwidth = bytes / time
 4线程
 8线程
 观察带宽是否增长。
+
+
+6,NUMA latency 实验
+
+7,branch prediction 实验
+
+8,cache line stride 实验
+
+9,TLB miss 实验
+
+10,prefetch 实验
+
+
+
+    实验	            理解的核心问题
+Cache locality	        为什么顺序访问更快
+Cache hierarchy	        CPU cache 大小与延迟
+Pointer chasing	        为什么链表慢
+False sharing	        多线程 cache 竞争
+Memory bandwidth	    内存带宽瓶颈
+cache line stride	    CPU cache line 如何影响内存访问效率
+NUMA latency	        不同 NUMA 节点访问内存的延迟差异
+prefetch	            CPU 预取机制如何减少 cache miss
+TLB miss	            虚拟地址转换为什么会影响性能
+branch prediction	    分支预测失败为什么会导致流水线停顿
+
+
+
 
 
 
