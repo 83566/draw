@@ -1,2 +1,3 @@
 # draw
-record computer learn chart
+record computer learn chart，
+recored everything
