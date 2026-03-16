@@ -9,6 +9,12 @@
 需要掌握：
 
   1 指令流水线（Instruction Pipeline）
+
+    学习 **指令流水线（Instruction Pipeline）**需要从三个层次掌握：
+    1）基本原理（流水线如何工作）
+    2）硬件结构（CPU内部模块）
+    3）性能影响（为什么程序会变慢或变快）
+
   核心概念：
     Fetch → Decode → Execute → Memory → Writeback
   需要理解：
