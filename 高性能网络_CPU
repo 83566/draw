@@ -1,0 +1,276 @@
+高性能网络（如 DPDK、XDP、数据面程序）本质是 CPU 主导的数据处理系统，因此高性能网络工程师需要重点掌握 CPU 微架构 + 内存子系统 + 并行执行机制。
+
+下面按重要程度列出核心知识体系。
+
+
+一、CPU 指令执行模型（基础）
+
+理解 CPU 如何执行代码，是理解性能瓶颈的基础。
+需要掌握：
+
+  1 指令流水线（Instruction Pipeline）
+  核心概念：
+    Fetch → Decode → Execute → Memory → Writeback
+  需要理解：
+    pipeline stall
+    pipeline flus
+    instruction latency
+    instruction throughput （指令的吞吐量）
+  关键问题：
+    为什么 cache miss 会导致流水线停顿？
+    为什么 branch mispredict 会清空流水线？
+
+  2 乱序执行（Out-of-Order Execution）
+    现代 CPU 并不是顺序执行指令。
+  关键模块：
+    Register Renaming
+    Reservation Station
+    Reorder Buffer
+  需要理解：
+    指令窗口（instruction window）
+    指令重排
+    提高 ILP（Instruction Level Parallelism）（指令级并行）
+
+  对网络程序的影响：  
+    CPU 会重排 independent instructions（独立的指令）
+  所以：
+    减少依赖链非常重要。
+
+
+  3 Superscalar（超标量）
+    CPU 每周期可以执行多条指令。
+    例如：
+      4-wide issue CPU？？？？
+    意味着：
+      每 cycle 可执行 4 条指令
+    影响：
+      代码是否有足够并行度？？
+
+
+
+二、CPU Cache 体系（最重要）
+
+  高性能网络 80% 的性能问题来自 cache。
+  
+  需要掌握：
+    Cache 层级
+    L1 cache   ~4 cycles
+    L2 cache   ~12 cycles
+    L3 cache   ~40 cycles
+    DRAM       ~200 cycles
+  理解：
+    cache line（通常 64B）
+    cache associativity
+    cache replacement policy
+    cache line
+  例如：
+    struct packet {
+        ...
+    }
+  如果跨 cache line：两次 memory access
+  优化：
+    数据结构 cache line 对齐
+    False Sharing
+
+  多个 CPU 核写同一 cache line：cache ping-pong
+  影响：严重性能下降
+  
+  典型场景：
+    per-core counter
+  解决：
+    padding
+    per-core data
+    Cache locality
+
+  两种局部性：
+    Temporal locality
+    Spatial locality
+
+  优化方式：
+    prefetch
+    数据结构紧凑
+    批量处理
+
+三、内存子系统（Memory Subsystem）
+
+  网络程序通常 memory bound。
+  需要掌握：
+
+  1 TLB（Translation Lookaside Buffer）
+    TLB 负责：
+    virtual address → physical address
+    如果 TLB miss：page walk
+    延迟：100+ cycles
+    优化：
+      HugePage
+    这就是 DPDK 使用 hugepage 的原因。
+
+    2 NUMA
+      多路服务器：
+        CPU socket 0
+        CPU socket 1
+        每个 socket 有独立内存。
+      延迟：
+        local memory   ~80ns
+        remote memory  ~130ns
+    
+      优化：
+        CPU affinity
+        NUMA aware allocation
+      DPDK：
+        每核独立队列
+
+  3 Memory Bandwidth
+    例如：
+    DDR4 100GB/s
+    如果 packet 处理需要频繁访问 memory：CPU 会被带宽限制??????
+
+  四、分支预测（Branch Prediction）
+    网络程序中常见：
+      if (packet_type == TCP)
+    如果分支预测失败：
+      pipeline flush
+    损失：
+      10~20 cycles
+    优化方法：
+      减少复杂分支
+      使用likely/unlikely
+    例如：
+      if (likely(pkt->type == TCP))
+
+
+五、SIMD / 向量指令
+
+现代 CPU 有：
+
+SSE
+AVX
+AVX512
+
+一次处理多个数据。
+
+例如：
+
+16 bytes
+32 bytes
+64 bytes
+
+网络处理常见应用：
+
+memcmp
+checksum
+packet classification
+
+DPDK 中很多代码使用：
+
+vectorized processing
+
+六、CPU Prefetch
+
+CPU 会提前加载数据：
+
+hardware prefetch
+
+程序也可以：
+
+__builtin_prefetch()
+
+典型 DPDK 写法：
+
+prefetch packet N+2
+process packet N
+
+形成 软件流水线。
+
+七、CPU 多核并行
+
+网络程序通常 scale with cores。
+
+需要掌握：
+
+CPU topology
+socket
+core
+hyperthread
+
+例如：
+
+2 socket
+16 cores
+32 threads
+CPU affinity
+
+绑定线程：
+
+sched_setaffinity()
+
+避免：
+
+thread migration
+RSS（Receive Side Scaling）
+
+NIC 将包分发到不同队列：
+
+queue0 → core0
+queue1 → core1
+
+减少锁。
+
+八、CPU 性能分析工具
+
+高性能网络必须掌握 CPU profiling。
+
+关键工具：
+
+Linux perf
+perf stat
+perf record
+perf top
+
+重要指标：
+
+cycles
+instructions
+IPC
+branch-misses
+cache-misses
+perf c2c
+
+分析：
+
+cache line contention
+
+用于定位：
+
+false sharing
+PMU（Performance Monitoring Unit）
+
+CPU 内部性能计数器。
+
+例如：
+
+L1-dcache-load-misses
+branch-misses
+LLC-load-misses
+九、PCIe 与 NIC 交互
+
+网络性能还涉及 CPU 与网卡通信。
+
+需要理解：
+
+DMA
+PCIe
+descriptor ring
+
+流程：
+
+NIC DMA → memory
+CPU poll ring → process packet
+
+DPDK 使用：
+
+poll mode driver
+
+避免：
+
+interrupt overhead
